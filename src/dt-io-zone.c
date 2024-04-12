@@ -1,6 +1,6 @@
 /*** dt-io-zone.c -- abstract from raw zone interface
  *
- * Copyright (C) 2010-2022 Sebastian Freundt
+ * Copyright (C) 2010-2024 Sebastian Freundt
  *
  * Author:  Sebastian Freundt <freundt@ga-group.nl>
  *
@@ -38,6 +38,7 @@
 # include "config.h"
 #endif	/* HAVE_CONFIG_H */
 #include <string.h>
+#include <sys/stat.h>
 #include "tzmap.h"
 #include "dt-io.h"
 #include "dt-io-zone.h"
@@ -135,6 +136,27 @@ __io_zone(const char *spec)
 	return res;
 }
 
+static char*
+__local(void)
+{
+	static char tzmfn[PATH_MAX];
+
+	if (!*tzmfn) {
+		struct stat st;
+
+		if (!stat("/etc/localtime", &st)) {
+			memcpy(tzmfn, "/etc/localtime", 14L);
+			goto gothim;
+		}
+		/* check /etc/timezone?
+		 * check /var/db/timezone?
+		 * check /etc/sysconfig/clock? */
+		return NULL;
+	}
+gothim:
+	return tzmfn;
+}
+
 zif_t
 dt_io_zone(const char *spec)
 {
@@ -165,6 +187,10 @@ Set TZMAP_DIR environment variable to where " TZMAP_SUF " files reside", tzmfn);
 		}
 		/* look up key bit in tzmap and use that if found */
 		if ((spec = tzm_find(tzm, ++p)) == NULL) {
+			return NULL;
+		}
+	} else if (!strcmp(spec, "localtime")) {
+		if ((spec = __local()) == NULL) {
 			return NULL;
 		}
 	}

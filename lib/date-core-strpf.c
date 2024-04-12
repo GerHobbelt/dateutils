@@ -1,6 +1,6 @@
 /*** date-core-strpf.c -- parser and formatter funs for date-core
  *
- * Copyright (C) 2011-2022 Sebastian Freundt
+ * Copyright (C) 2011-2024 Sebastian Freundt
  *
  * Author:  Sebastian Freundt <freundt@ga-group.nl>
  *
@@ -316,12 +316,22 @@ __strpd_card(struct strpd_s *d, const char *sp, struct dt_spec_s s, char **ep)
 				dut_long_mon, dut_nlong_mon);
 			break;
 		case DT_SPMOD_ABBR: {
+#if 0
+/* branchless version but no error handling */
+			int r = *sp++ - 'E';
+			r -= (r >> 2);
+			r -= (r >= 12) << 1;
+			r -= (r > 8);
+			r -= (r >= 12);
+			d->m = r;
+#else
 			const char *pos;
 			if ((pos = strchr(dut_abab_mon, *sp++)) != NULL) {
 				d->m = pos - dut_abab_mon;
 			} else {
 				d->m = -1;
 			}
+#endif
 			break;
 		}
 		case DT_SPMOD_ILL:
