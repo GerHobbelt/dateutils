@@ -38,6 +38,10 @@
 
 #include "nifty.h"
 
+#if defined(_MSC_VER)
+#define __attribute__(c)
+#endif
+
 #if !defined DEFUN
 # define DEFUN
 #endif	/* !DEFUN */

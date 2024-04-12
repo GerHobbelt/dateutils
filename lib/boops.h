@@ -64,6 +64,10 @@
 # include <byteswap.h>
 #endif	/* BYTESWAP_H */
 
+#if defined(_MSC_VER)
+#define __attribute__(c)
+#endif
+
 #if !defined BYTE_ORDER
 # if defined __BYTE_ORDER
 #  define BYTE_ORDER	__BYTE_ORDER
