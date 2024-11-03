@@ -341,6 +341,7 @@ __trans_dtfmt(const char **fmt)
 		default:
 			break;
 		case DT_YMD:
+		case DT_UMMULQURA:
 			*fmt = ymdhms_dflt;
 			break;
 		case DT_YMCW:
@@ -615,6 +616,7 @@ dt_strpdt(const char *str, const char *fmt, char **ep)
 	struct strpdt_s d = {0};
 	const char *sp = str;
 	const char *fp;
+	int transd = 0;
 
 	if (LIKELY(fmt == NULL)) {
 		return __strpdt_std(str, ep);
@@ -623,6 +625,9 @@ dt_strpdt(const char *str, const char *fmt, char **ep)
 	switch ((dt_dtyp_t)__trans_dtfmt(&fmt)) {
 		char *on;
 	default:
+		transd++;
+	case DT_DUNK:
+		/* not trans'd */
 		break;
 
 		/* special case julian/lilian dates as they have
@@ -693,6 +698,14 @@ dt_strpdt(const char *str, const char *fmt, char **ep)
 			dt_make_d_only(&res, DT_MDN);
 		}
 		goto sober;
+	case DT_UMMULQURA:
+		res.d = dt_strpd_special(sp, DT_UMMULQURA, &on);
+		if (*(sp = on)) {
+			/* only accept dates for now */
+			goto fucked;
+		}
+		dt_make_d_only(&res, DT_UMMULQURA);
+		goto sober;
 	}
 
 	fp = fmt;
@@ -735,6 +748,10 @@ dt_strpdt(const char *str, const char *fmt, char **ep)
 		}
 	}
 	/* check suffix literal */
+	if (!*sp && transd && *fp == 'T') {
+		/* think we just parsed the date bit */
+		goto transd;
+	}
 	if (*fp && *fp != *sp) {
 		goto fucked;
 	}
@@ -743,6 +760,7 @@ dt_strpdt(const char *str, const char *fmt, char **ep)
 		res.typ = DT_SEXY;
 		res.sexy = d.i;
 	} else {
+	transd:
 		/* assign d and t types using date and time core routines */
 		d = massage_strpdt(d);
 		res.d = __guess_dtyp(d.sd);
@@ -834,6 +852,10 @@ dt_strfdt(char *restrict buf, size_t bsz, const char *fmt, struct dt_dt_s that)
 		case DT_YMDHMS:
 			fmt = ymdhms_dflt;
 			break;
+		/* ymd like calendars */
+		case DT_UMMULQURA:
+			fmt = ymdhms_dflt;
+			break;
 		default:
 			/* fuck */
 			abort();
@@ -864,6 +886,10 @@ dt_strfdt(char *restrict buf, size_t bsz, const char *fmt, struct dt_dt_s that)
 		case DT_LDN:
 		case DT_MDN:
 			goto strf_xian;
+		/* ymd like calendars */
+		case DT_UMMULQURA:
+			fmt = ymd_dflt;
+			break;
 		default:
 			/* fuck */
 			abort();
@@ -894,6 +920,7 @@ dt_strfdt(char *restrict buf, size_t bsz, const char *fmt, struct dt_dt_s that)
 
 	switch (that.typ) {
 	case DT_YMD:
+	case DT_UMMULQURA:
 	ymd_prep:
 		d.sd.y = that.d.ymd.y;
 		d.sd.m = that.d.ymd.m;
@@ -1402,6 +1429,7 @@ dt_dtconv(dt_dttyp_t tgttyp, struct dt_dt_s d)
 		case DT_JDN:
 		case DT_LDN:
 		case DT_MDN:
+		case DT_UMMULQURA:
 			/* backup sandwich state */
 			sw = d.sandwich;
 			/* convert */
