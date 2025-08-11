@@ -40,6 +40,12 @@
 #include <stdint.h>
 #include <stddef.h>
 
+// fix error C2143: syntax error: missing ')' before '(' + warning C4255: '__attribute__': no function prototype given: converting '()' to '(void)'
+#if !defined(__GNUC__) && !defined(__clang__)
+#undef __attribute__
+#define __attribute__(x)
+#endif
+
 /* stolen from Klaus Klein/David Laight's strptime() */
 /**
  * Convert STR to i32 and point to the end of the string in EP. */

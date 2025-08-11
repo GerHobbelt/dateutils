@@ -37,6 +37,12 @@
 #if !defined INCLUDED_token_h_
 #define INCLUDED_token_h_
 
+ // fix error C2143: syntax error: missing ')' before '(' + warning C4255: '__attribute__': no function prototype given: converting '()' to '(void)'
+#if !defined(__GNUC__) && !defined(__clang__)
+#undef __attribute__
+#define __attribute__(x)
+#endif
+
 /* spec tokeniser, spec flags plus modifiers and stuff */
 typedef enum {
 	DT_SPFL_UNK,
