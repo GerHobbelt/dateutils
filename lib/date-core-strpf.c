@@ -386,11 +386,12 @@ __strpd_card(struct strpd_s *d, const char *sp, struct dt_spec_s s, char **ep)
 		break;
 	case DT_SPFL_N_WCNT_YEAR:
 		/* was %C, cannot be used at the moment */
-		d->c = strtoi_lim(sp, &sp, 0, 53);
-		d->flags.wk_cnt = s.wk_cnt;
-		/* let everyone know d->c has a week-count in there */
-		d->flags.c_wcnt_p = 1;
-		res = 0;
+		if ((d->c = strtoi_lim(sp, &sp, 0, 53)) >= 0) {
+			d->flags.wk_cnt = s.wk_cnt;
+			/* let everyone know d->c has a week-count in there */
+			d->flags.c_wcnt_p = 1;
+			res = 0;
+		}
 		break;
 	}
 	/* assign end pointer */
