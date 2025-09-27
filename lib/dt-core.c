@@ -1636,7 +1636,14 @@ dt_dtdiff(dt_dtdurtyp_t tgttyp, struct dt_dt_s d1, struct dt_dt_s d2)
 	struct dt_dtdur_s res = {(dt_dtdurtyp_t)DT_DURUNK};
 	int64_t dt = 0;
 
-	if (!dt_sandwich_only_d_p(d1) && !dt_sandwich_only_d_p(d2)) {
+	if (UNLIKELY(d1.typ >= DT_SEXY && d2.typ >= DT_SEXY)) {
+		goto sexy;
+	} else if (UNLIKELY(d1.typ >= DT_SEXY)) {
+		goto sexyd1;
+	} else if (UNLIKELY(d2.typ >= DT_SEXY)) {
+		d1 = dt_dtconv(DT_SEXY, d1);
+		goto sexy;
+	} else if (!dt_sandwich_only_d_p(d1) && !dt_sandwich_only_d_p(d2)) {
 		/* do the time portion difference right away */
 		switch (tgttyp) {
 		default:
@@ -1680,8 +1687,9 @@ dt_dtdiff(dt_dtdurtyp_t tgttyp, struct dt_dt_s d1, struct dt_dt_s d2)
 			/* oh we're in the sexy domain already,
 			 * note, we can't diff ymdhms packs */
 			d1 = dt_dtconv(DT_SEXY, d1);
+		sexyd1:
 			d2 = dt_dtconv(DT_SEXY, d2);
-
+		sexy:
 			/* now it's fuck-easy */
 			sxdur = (int64_t)(d2.sexy - d1.sexy);
 		}
