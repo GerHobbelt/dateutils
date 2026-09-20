@@ -78,21 +78,20 @@ EXTRA_libdut_a_SOURCES += bizda.c
 EXTRA_libdut_a_SOURCES += daisy.c
 EXTRA_libdut_a_SOURCES += fmt-special.gperf
 EXTRA_libdut_a_SOURCES += leap-seconds.list
-EXTRA_libdut_a_SOURCES += ummulqura.c
 BUILT_SOURCES += version.c
 BUILT_SOURCES += fmt-special.c
 BUILT_SOURCES += leap-seconds.def
 
 noinst_PROGRAMS += tzmap
 tzmap_SOURCES = tzmap.c tzmap.h tzmap.yuck
-tzmap_CPPFLAGS = -D_POSIX_C_SOURCE=200809L -D_XOPEN_SOURCE=700 -D_BSD_SOURCE -D_DEFAULT_SOURCE
+tzmap_CPPFLAGS = -D_POSIX_C_SOURCE=200809L -D_XOPEN_SOURCE=700 -D_BSD_SOURCE
 tzmap_CPPFLAGS += -DSTANDALONE
 BUILT_SOURCES += tzmap.yucc
 
 noinst_PROGRAMS += tzraw
 tzraw_SOURCES = tzraw.c tzraw.h
 tzraw_SOURCES += leaps.h leaps.c
-tzraw_CPPFLAGS = -D_POSIX_C_SOURCE=200809L -D_XOPEN_SOURCE=700 -D_BSD_SOURCE -D_DEFAULT_SOURCE
+tzraw_CPPFLAGS = -D_POSIX_C_SOURCE=200809L -D_XOPEN_SOURCE=700 -D_BSD_SOURCE
 tzraw_CPPFLAGS += -DSTANDALONE
 
 ## some tzmaps we'd like to support
